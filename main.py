@@ -15,7 +15,7 @@ class Transformasiabrrot(ThreeDScene, MovingCamera):
         self.write_mat()
         self.do_translate(2, 2, 3)
         self.wait()
-        self.do_translate(-2, -3, 3)
+        self.do_translate(-2, -2, -3)
         self.do_scale(2)
         self.wait()
         self.do_scale(1/2)
@@ -129,3 +129,29 @@ class Transformasiabrrot(ThreeDScene, MovingCamera):
 
     def do_rotation(self, deg):
         self.play(self.main_obj.animate.rotate(angle=deg*DEGREES, axis=UP, about_point=ORIGIN), run_time=2)
+
+
+class introNama(Scene):
+    def construct(self):
+        judul = Tex("Transfomasi")
+        nama = [Tex("Faizal Husain Adiasha"),
+                Tex("Givandra Haikal Adjie"),
+                Tex("Zidan Rafindra Utomo")
+        ]
+
+        judul.to_edge(UP)
+        judul.shift(LEFT)
+        nama[0].next_to(judul, DOWN).align_to(judul, OUT)
+        nama[1].next_to(nama[0], DOWN).align_to(judul, OUT)
+        nama[2].next_to(nama[1], DOWN).align_to(judul, OUT)
+
+        tex_gr = VGroup(judul, *nama)
+        tex_gr.move_to(ORIGIN)
+        tex_gr.scale(1.5)
+
+        self.play(Write(judul))
+        self.play(Write(nama[0]))
+        self.play(Write(nama[1]))
+        self.play(Write(nama[2]))
+        self.wait()
+        self.play(FadeOut(tex_gr))
