@@ -2,7 +2,9 @@
 Tugas Kelas GKV Informatika Undip 2022
 
 # Hasil
-![Shariyl](./media/videos/main/1080p60/Transformasi.gif)
+![muter](./media/videos/main/1080p60/TranslasiScene.gif)
+![muter](./media/videos/main/1080p60/SkalaScene.gif)
+![muter](./media/videos/main/1080p60/RotasiScene.gif)
 
 # How to start?
 
