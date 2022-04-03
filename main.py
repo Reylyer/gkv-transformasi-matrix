@@ -392,28 +392,34 @@ class RotasiScene(Scene):
             [r"z"],
             [1]
         ], element_alignment_corner=OUT)
-        step1_mat = Matrix([
-            [r"x\cdot1 + y\cdot0 + z\cdot0 + T_{x}\cdot1"],
-            [r"x\cdot0 + y\cdot1 + z\cdot0 + T_{y}\cdot1"],
-            [r"x\cdot0 + y\cdot0 + z\cdot1 + T_{z}\cdot1"],
-            [1]
+        raw_rot_mat_x = Matrix([
+            [ 1, 0,             0,              0],
+            [ 0, r"\cos\theta", r"-\sin\theta", 0],
+            [ 0, r"\sin\theta", r"\cos\theta",  0],
+            [ 1, 1,             1,              1],
         ], element_alignment_corner=OUT)
-        step2_mat = Matrix([
-            [r"x + T_{x}"],
-            [r"y + T_{y}"],
-            [r"z + T_{z}"],
-            [1]
+        raw_rot_mat_y = Matrix([
+            [ r"\cos\theta",  0, r"-\sin\theta",0],
+            [ 0,              1, 0,             0],
+            [ r"\sin\theta",  0, r"\cos\theta", 0],
+            [ 1,              1, 1,             1],
         ], element_alignment_corner=OUT)
-        raw_transf_mat = Matrix([
-            [ 1, 0, 0, r"T_{x}"],
-            [ 0, 1, 0, r"T_{y}"],
-            [ 0, 0, 1, r"T_{z}"],
-            [ 1, 1, 1, 1],
+        raw_rot_mat_z = Matrix([
+            [ r"\cos\theta", r"-\sin\theta", 0, 0],
+            [ r"\sin\theta", r"\cos\theta",  0, 0],
+            [ 0,             0,              1, 0],
+            [ 1,             1,              1, 1],
         ], element_alignment_corner=OUT)
-        tranf_mat = Matrix([
-            [ 1, 0, 0, 2],
-            [ 0, 1, 0, 3],
-            [ 0, 0, 1, 3],
+        rot_mat_z_90 = Matrix([
+            [ r"\cos90", r"-\sin90", 0, 0],
+            [ r"\sin90", r"\cos90",  0, 0],
+            [ 0,         0,          1, 0],
+            [ 1,         1,          1, 1],
+        ], element_alignment_corner=OUT)
+        rot_mat_z = Matrix([
+            [ 0,-1, 0, 0],
+            [ 1, 0, 0, 0],
+            [ 0, 0, 1, 0],
             [ 1, 1, 1, 1],
         ], element_alignment_corner=OUT)
         vertex_mat = Matrix([
@@ -422,68 +428,234 @@ class RotasiScene(Scene):
             [ 0, 1, 0, 0,-1, 0],
             [ 1, 1, 1, 1, 1, 1],
         ], element_alignment_corner=OUT)
-        vert_res_mat = Matrix([
-            [ 5, 2, 2,-1, 2, 2],
-            [ 3, 3, 5, 3, 3, 1],
-            [ 2, 3, 2, 2, 1, 2],
+        vert_res_mat_z = Matrix([
+            [ 0, 0,-2, 0, 0, 2],
+            [ 3, 0, 0,-3, 0, 0],
+            [ 0, 1, 0, 0,-1, 0],
             [ 1, 1, 1, 1, 1, 1],
         ], element_alignment_corner=OUT)
 
+
         up_eq_sign = Tex("=")
         down_eq_sign = Tex("=")
-        judul = Tex("Translasi")
-        label_tranf_mat = Tex("Matrix transformasi").set_color(YELLOW)
-        label_titik = Tex("Matrix titik").set_color(YELLOW)
+        judul = Tex("Rotasi")
+        label_rot_x = Tex("Sumbu x").set_color(YELLOW)
+        label_rot_y = Tex("Sumbu y").set_color(YELLOW)
+        label_rot_z = Tex("Sumbu z").set_color(YELLOW)
+        label_group = VGroup(label_rot_x, label_rot_y, label_rot_z)
 
         judul.to_corner(LEFT + UP)
-        vertex_mat.next_to(tranf_mat, RIGHT)
-        up_eq_sign.next_to(tranf_mat, LEFT)
-        vert_res_mat.next_to(tranf_mat, DOWN)
-        vert_res_mat.align_to(tranf_mat, LEFT)
-        down_eq_sign.next_to(vert_res_mat, LEFT)
-        xyz_aksen.next_to(up_eq_sign, LEFT)
-        xyz.next_to(tranf_mat, RIGHT)
-        step1_mat.next_to(tranf_mat, DOWN)
-        step1_mat.align_to(tranf_mat, LEFT)
-        step2_mat.next_to(tranf_mat, DOWN)
-        step2_mat.align_to(tranf_mat, LEFT)
+        
+        scaled_half_group = VGroup(xyz, xyz_aksen, raw_rot_mat_x, raw_rot_mat_y, raw_rot_mat_z, rot_mat_z_90,
+                                rot_mat_z, vertex_mat, vert_res_mat_z, up_eq_sign, down_eq_sign, label_group)
+        scaled_half_group.scale(0.5)
 
-        label_tranf_mat.next_to(tranf_mat, UP)
-        label_titik.next_to(vertex_mat, UP)
+        # raw steak.matrix
+        raw_rot_mat_x.next_to(raw_rot_mat_y, RIGHT)
+        raw_rot_mat_z.next_to(raw_rot_mat_y, LEFT)
+        label_rot_x.next_to(raw_rot_mat_x, UP)
+        label_rot_y.next_to(raw_rot_mat_y, UP)
+        label_rot_z.next_to(raw_rot_mat_z, UP)
 
+        raw_mat_group = VGroup(raw_rot_mat_x, raw_rot_mat_y, raw_rot_mat_z, label_group)
+        raw_mat_group.move_to(ORIGIN)
 
-        all_group = VGroup(xyz_aksen, tranf_mat, vertex_mat, down_eq_sign, up_eq_sign, vert_res_mat, label_titik, label_tranf_mat, xyz, step1_mat, step2_mat)
-        all_group.move_to(ORIGIN)
-        all_group.scale(0.5)
-        raw_transf_mat.scale(0.5)
-        perkalian_group = VGroup(tranf_mat, vertex_mat)
-        raw_transf_mat2 = raw_transf_mat.copy().move_to(tranf_mat)
+        backup_raw_rot_z = raw_rot_mat_z.copy()
+
+        kotak_x = SurroundingRectangle(raw_rot_mat_x.get_columns()[0])
+        kotak_y = SurroundingRectangle(raw_rot_mat_y.get_columns()[1])
+        kotak_z = SurroundingRectangle(raw_rot_mat_z.get_columns()[2])
+        kotak_group = VGroup(kotak_x, kotak_y, kotak_z)
+
+    
+        # sesi 1
+        """
+        matrix masih cos sin, tunjukan sumbu, fade semua kecuali sumbu z
+        """
 
         self.play(Write(judul))
+        self.wait(2)
+        self.play(Write(raw_rot_mat_x))
         self.wait()
-        self.play(Write(raw_transf_mat))
+        self.play(Write(raw_rot_mat_y))
         self.wait()
-        self.play(Transform(raw_transf_mat, tranf_mat))
-        self.remove(tranf_mat)
+        self.play(Write(raw_rot_mat_z))
         self.wait()
-        self.play(Write(xyz_aksen), Write(up_eq_sign), Write(vertex_mat))
+        self.play(FadeIn(label_rot_x, shift=DOWN))
         self.wait()
-        self.play(FadeIn(label_tranf_mat, shift=DOWN))
-        self.wait
-        self.play(FadeIn(label_titik, shift=DOWN))
+        self.play(FadeIn(label_rot_y, shift=DOWN))
         self.wait()
-        self.play(FadeOut(label_tranf_mat, shift=UP), FadeOut(label_titik, shift=UP))
+        self.play(FadeIn(label_rot_z, shift=DOWN))
         self.wait()
-        self.play(Write(down_eq_sign), TransformFromCopy(perkalian_group, vert_res_mat))
+        self.play(Write(kotak_group))
+        self.wait()
+        self.play(FadeOut(kotak_group))
+        self.wait()
+        self.play(FadeOut(label_group, shift=UP), FadeOut(raw_rot_mat_x), FadeOut(raw_rot_mat_y))
         self.wait()
 
-        self.play(Transform(raw_transf_mat, raw_transf_mat2), vertex_mat.animate.become(xyz), FadeOut(vert_res_mat))
+        # sesi 2
+        """
+        setelah fade out semua, matrix rotasi sumbu z dicolok 90 habis tu jadi nilai yang 0 -1 1 0
+        """
+        self.play(raw_rot_mat_z.animate.move_to(rot_mat_z_90))
         self.wait()
-        group_nyempil = VGroup(raw_transf_mat, vertex_mat)
-        self.play(TransformFromCopy(group_nyempil, step1_mat))
+        self.play(Transform(raw_rot_mat_z, rot_mat_z_90))
+        self.wait()
+        self.play(Transform(raw_rot_mat_z, rot_mat_z))
+        self.wait()
+        rot_mat_z = raw_rot_mat_z
+
+        # sesi 3
+
+        """
+        yang udah 0 -1 1 0 di geser ke suatu posisi, kemudian show vertices, equal sign sama xyz aksen
+        udah gitu kaliin transform ke bawah, fadeout yang bawah
+        """
+        # arranging
+        phantom_rot_mat_z = rot_mat_z.copy().set_opacity(0.0)
+        vertex_mat.next_to(phantom_rot_mat_z, RIGHT)
+        up_eq_sign.next_to(phantom_rot_mat_z, LEFT)
+        xyz_aksen.next_to(up_eq_sign, LEFT)
+        vert_res_mat_z.next_to(phantom_rot_mat_z, DOWN)
+        vert_res_mat_z.align_to(phantom_rot_mat_z, LEFT)
+        down_eq_sign.next_to(vert_res_mat_z, LEFT)
+
+        kali_point_group = VGroup(phantom_rot_mat_z, vertex_mat, up_eq_sign, xyz_aksen,
+                                vert_res_mat_z, down_eq_sign)
+        kali_point_group.move_to(ORIGIN)
+        persamaan_atas_group = VGroup(vertex_mat, up_eq_sign, xyz_aksen)
+
+
+        # anim
+        self.play(rot_mat_z.animate.move_to(phantom_rot_mat_z))
+        self.wait()
+        self.play(Write(persamaan_atas_group))
+        self.wait()
+        perkalian_group = VGroup(vertex_mat, rot_mat_z)
+        self.play(Write(down_eq_sign), TransformFromCopy(perkalian_group, vert_res_mat_z))
+        self.wait()
+        self.play(FadeOut(vert_res_mat_z))
+        self.wait()
+
+        # sesi 4
+        """
+        ubah 0 -1 1 0 jadi sumbu z awal, vertex jadi xyz, kali lalu transform kebawah, sederhanain, fade out
+        """
+        # new var
+        step1_mat = Matrix([
+            [r"\cos\theta \cdot x - \sin\theta \cdot y + 0 \cdot z + 0 \cdot 1"],
+            [r"\sin\theta \cdot x + \cos\theta \cdot y + 0 \cdot z + 0 \cdot 1"],
+            [r"0 \cdot x          +          0 \cdot y + 1 \cdot z + 0 \cdot 1"],
+            [r"0 \cdot x          +          0 \cdot y + 0 \cdot z + 1 \cdot 1"]
+        ], element_alignment_corner=OUT)
+        step2_mat = Matrix([
+            [r"\cos\theta \cdot x - \sin\theta \cdot y"],
+            [r"\sin\theta \cdot x + \cos\theta \cdot y"],
+            [r"z"],
+            [1]
+        ], element_alignment_corner=OUT)
+
+        step1_mat.scale(0.5)
+        step2_mat.scale(0.5)
+
+        # arranging
+        raw_rot_mat_z = backup_raw_rot_z
+        raw_rot_mat_z.next_to(up_eq_sign, RIGHT)
+        xyz.next_to(raw_rot_mat_z, RIGHT)
+        label_rot_z.next_to(raw_rot_mat_z, UP)
+        step1_mat.next_to(down_eq_sign, RIGHT)
+        step2_mat.next_to(down_eq_sign, RIGHT)
+
+        # anim
+        self.play(ReplacementTransform(rot_mat_z, raw_rot_mat_z), ReplacementTransform(vertex_mat, xyz))
+        self.wait()
+        self.play(FadeIn(label_rot_z, shift=DOWN))
+        self.wait()
+        perkalian_group = VGroup(raw_rot_mat_z, xyz)
+        self.play(TransformFromCopy(perkalian_group, step1_mat))
         self.wait()
         self.play(Transform(step1_mat, step2_mat))
         self.wait()
+        self.play(FadeOut(label_rot_z, shift=UP), FadeOut(step1_mat))
+        self.wait()
+
+        # sesi 5
+        """
+        ubah sumbu z jadi sumbu y, kali lalu transform kebawah, sederhanain, fade out
+        """
+        # new var !
+        step1_mat = Matrix([
+            [r"\cos\theta \cdot x - 0 \cdot y + \sin\theta \cdot z + 0 \cdot 1"],
+            [r"0                  + 1 \cdot y +          0 \cdot z + 0 \cdot 1"],
+            [r"\sin\theta \cdot x + 0 \cdot y + \cos\theta \cdot z + 0 \cdot 1"],
+            [r"0 \cdot x          + 0 \cdot y +          0 \cdot z + 1 \cdot 1"]
+        ], element_alignment_corner=OUT)
+        step2_mat = Matrix([
+            [r"\cos\theta \cdot x - \sin\theta \cdot z"],
+            [r"y"],
+            [r"\sin\theta \cdot x + \cos\theta \cdot z"],
+            [1]
+        ], element_alignment_corner=OUT)
+
+        step1_mat.scale(0.5)
+        step2_mat.scale(0.5)
+
+        # arranging
+        raw_rot_mat_y.next_to(up_eq_sign, RIGHT)
+        label_rot_y.next_to(raw_rot_mat_y, UP)
+        step1_mat.next_to(down_eq_sign, RIGHT)
+        step2_mat.next_to(down_eq_sign, RIGHT)
+
+        self.play(ReplacementTransform(raw_rot_mat_z, raw_rot_mat_y), xyz.animate.next_to(raw_rot_mat_y))
+        self.wait()
+        self.play(FadeIn(label_rot_y, shift=DOWN))
+        self.wait()
+        perkalian_group = VGroup(raw_rot_mat_y, xyz)
+        self.play(TransformFromCopy(perkalian_group, step1_mat))
+        self.wait()
+        self.play(Transform(step1_mat, step2_mat))
+        self.wait()
+        self.play(FadeOut(label_rot_y, shift=UP), FadeOut(step1_mat))
+        self.wait()
+        
+        # sesi 5
+        """
+        ubah sumbu y jadi sumbu z, kali lalu transform kebawah, sederhanain, fade out all
+        """
+        step1_mat = Matrix([
+            [r"1 \cdot x +          0 \cdot y +           0 \cdot z + 0 \cdot 1"],
+            [r"0 \cdot x + \cos\theta \cdot y -  \sin\theta \cdot z + 0 \cdot 1"],
+            [r"0 \cdot x + \sin\theta \cdot y +  \cos\theta \cdot z + 0 \cdot 1"],
+            [r"0 \cdot x          + 0 \cdot y +           0 \cdot z + 1 \cdot 1"]
+        ], element_alignment_corner=OUT)
+        step2_mat = Matrix([
+            [r"x"],
+            [r"\cos\theta \cdot y - \sin\theta \cdot z"],
+            [r"\sin\theta \cdot y + \cos\theta \cdot z"],
+            [1]
+        ], element_alignment_corner=OUT)
+
+        step1_mat.scale(0.5)
+        step2_mat.scale(0.5)
+
+        # arranging
+        raw_rot_mat_x.next_to(up_eq_sign, RIGHT)
+        label_rot_x.next_to(raw_rot_mat_x, UP)
+        step1_mat.next_to(down_eq_sign, RIGHT)
+        step2_mat.next_to(down_eq_sign, RIGHT)
+
+        self.play(ReplacementTransform(raw_rot_mat_y, raw_rot_mat_x), xyz.animate.next_to(raw_rot_mat_x))
+        self.wait()
+        self.play(FadeIn(label_rot_x, shift=DOWN))
+        self.wait()
+        perkalian_group = VGroup(raw_rot_mat_x, xyz)
+        self.play(TransformFromCopy(perkalian_group, step1_mat))
+        self.wait()
+        self.play(Transform(step1_mat, step2_mat))
+        self.wait()
+
+
 
 
 class TestScene(Scene):
